@@ -1,0 +1,114 @@
+import random
+
+def bienvenida():
+    print("\n" + "-" * 46)
+    print("🧩           BIENVENIDO A ENIGMA           🧩")
+    print("-" * 46)
+    print("""
+La computadora ha pensado un número secreto de 5 cifras.
+
+En cada intento recibirás dos pistas:
+
+✓ Bien ubicados: cifra correcta en la posición correcta.
+↺ Mal ubicados: cifra correcta en una posición incorrecta.
+
+¿Podrás descubrir el número antes de quedarte sin intentos?
+
+¡Comienza el desafío!
+""")
+
+def comparar_numeros(numero, numero_sugerido):
+  respuesta=[0,0]   #mal ubicados, bien ubicados
+  copia = list(numero_sugerido)
+  #Cuenta de los bien ubicados:
+  for i in range(len(numero)):
+    if numero[i]==copia[i]:
+      respuesta[1]+=1
+      copia[i] = None    #ya fue utilizada
+  #Cuenta de los mal ubicados:
+  for i in range(len(numero)):
+    if numero[i] != numero_sugerido[i]:
+      if numero[i] in copia:
+        respuesta[0] +=1
+        copia[copia.index(numero[i])] = None
+  if respuesta[1]==5:
+    print()
+    print("🏆 Adivinaste!")
+  else:
+    print("Hay ",respuesta[0]," números mal ubicados y ",respuesta[1]," números bien ubicados.")
+  return respuesta
+
+
+def pedir_cantidad_intentos():
+    while True:
+        intentos = input("Fijamos un número máximo de intentos? ").strip().upper()
+        if intentos in ("SI", "SÍ"):
+          while True:
+            cantidad = input("Cuántos? ")
+            if not cantidad.isdigit():
+              print("Ingresá un número entero.")
+              continue
+            cantidad = int(cantidad)
+            if cantidad <= 0:
+              print("La cantidad de intentos debe ser mayor que 0.")
+              continue
+            return cantidad
+        elif intentos == "NO":
+            print("Si en algún momento querés rendirte, escribí RENDIRME")
+            return float("inf")
+        else:
+            print("No te entendí.")
+
+
+def pedir_numero():
+    while True:
+        numero_sugerido = input("Ingresá un número de 5 cifras: ").upper()
+        if numero_sugerido == "RENDIRME":
+          return numero_sugerido
+        if not numero_sugerido.isdigit():
+            print("Sólo podés ingresar números.")
+            continue
+        if len(numero_sugerido) != 5:
+            print("Ingresar exactamente 5 cifras.")
+            continue
+        return numero_sugerido
+
+
+def jugar():
+    numero_rand = str(random.randint(10000,99999))
+    respuesta = [0,0]
+    jugadas = 0
+    cantidad_intentos = pedir_cantidad_intentos()
+    while respuesta[1] != 5 and jugadas < cantidad_intentos:
+        numero_sugerido = pedir_numero()
+        if numero_sugerido == "RENDIRME":
+          print()
+          print("🏳️ Te rendiste.")
+          print("El número era",numero_rand)
+          return
+        respuesta = comparar_numeros(numero_rand, numero_sugerido)
+        jugadas += 1
+    if respuesta[1] == 5:
+        print("Ganaste en", jugadas, "intentos.")
+    else:
+        print()
+        print("💀 Se acabaron los intentos.")
+        print("Perdiste. El número era", numero_rand)
+
+def pedir_si_no(mensaje):
+  while True:
+        respuesta = input(mensaje).strip().upper()
+        if respuesta in ("SI", "SÍ", "NO"):
+            return respuesta
+        else:
+            print("No te entendí.")
+
+
+bienvenida()
+while True:
+    jugar()
+
+    if pedir_si_no("Jugamos de nuevo? ") == "NO":
+        print()
+        print("Hasta la próxima!")
+        break
